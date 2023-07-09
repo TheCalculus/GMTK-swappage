@@ -4,7 +4,7 @@ using UnityEngine.EventSystems;
 
 public class GridSystem : MonoBehaviour
 {
-    public Tilemap[] tilemap = new Tilemap[3];
+    public Tilemap[] tilemap = new Tilemap[2]; // Changed the array size to 2 (0 and 1)
     public CustomTile[] tileset;
     public int sideLength;
 
@@ -30,7 +30,7 @@ public class GridSystem : MonoBehaviour
                 if (tile != null)
                 {
                     Vector3Int position = new Vector3Int(x, y, 0);
-                    tilemap[tile.layer].SetTile(position, tile);
+                    tilemap[0].SetTile(position, tile); // Changed the tilemap index to 0
                     customTiles[x, y] = tile;
                 }
             }
@@ -88,7 +88,8 @@ public class GridSystem : MonoBehaviour
             if (tile != null)
             {
                 tilemap[1].SetTile(cellPosition, tile);
-                tile.isFinal = Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject();
+                tile.isFinal =
+                    Input.GetMouseButton(0) && !EventSystem.current.IsPointerOverGameObject();
                 customTiles[cellPosition.x, cellPosition.y] = tile;
             }
 
