@@ -18,7 +18,7 @@ public class GridSystem : MonoBehaviour
     [SerializeField]
     private TileBehaviour tileBehaviour;
 
-    private TileBehaviorManager behaviorManager;
+    private TileBehaviourManager behaviourManager;
 
     private void Start()
     {
@@ -26,8 +26,7 @@ public class GridSystem : MonoBehaviour
         Camera.main.transform.position = new Vector3(gridX / 2, 0.175f * gridY, -10);
 
         customTiles = new CustomTile[gridX, gridY];
-
-        behaviorManager = new TileBehaviorManager();
+        behaviourManager = new TileBehaviourManager();
 
         for (int x = 0; x < gridX; x++)
         {
@@ -114,67 +113,99 @@ public class GridSystem : MonoBehaviour
                 customTiles[cellPosition.x, cellPosition.y] = tile;
 
                 if (tile.isFinal)
-                    behaviorManager.ApplyBehavior(tile, cellPosition, this);
+                    behaviourManager.ApplyBehaviour(tile, cellPosition, this);
             }
 
             previousHoverPosition = cellPosition;
         }
+
+        behaviourManager.UpdateAllBehaviours();
     }
 }
 
-public class TileBehaviorManager
+public struct Behaviour
 {
-    private Dictionary<Identifiers.Identifier, ITileBehavior> behaviorDictionary;
+    public ITileBehaviour behaviour;
+    public CustomTile tile;
+    public Vector3Int position;
+    public GridSystem gridSystem;
+}
 
-    public TileBehaviorManager()
+public class TileBehaviourManager
+{
+    private Dictionary<Identifiers.Identifier, ITileBehaviour> behaviourDictionary;
+    private List<Behaviour> behaviours;
+
+    public TileBehaviourManager()
     {
-        behaviorDictionary = new Dictionary<Identifiers.Identifier, ITileBehavior>();
+        behaviourDictionary = new Dictionary<Identifiers.Identifier, ITileBehaviour>();
 
-        behaviorDictionary.Add(Identifiers.Identifier.MUSHROOM, new MushroomTileBehavior());
-        behaviorDictionary.Add(Identifiers.Identifier.CONDUIT, new ConduitTileBehavior());
-        behaviorDictionary.Add(Identifiers.Identifier.SMOKES, new SmokesTileBehavior());
-        behaviorDictionary.Add(Identifiers.Identifier.WALL, new WallTileBehavior());
+        behaviourDictionary.Add(Identifiers.Identifier.MUSHROOM, new MushroomTileBehaviour());
+        behaviourDictionary.Add(Identifiers.Identifier.CONDUIT, new ConduitTileBehaviour());
+        behaviourDictionary.Add(Identifiers.Identifier.SMOKES, new SmokesTileBehaviour());
+        behaviourDictionary.Add(Identifiers.Identifier.WALL, new WallTileBehaviour());
+
+        behaviours = new List<Behaviour>();
     }
 
-    public void ApplyBehavior(CustomTile tile, Vector3Int position, GridSystem gridSystem)
+    public void UpdateAllBehaviours()
     {
-        if (behaviorDictionary.TryGetValue(tile.identifier, out ITileBehavior behavior))
-            behavior.Apply(tile, position, gridSystem);
+        foreach (Behaviour behaviour in behaviours)
+        {
+            behaviour.behaviour.Update(behaviour.tile, behaviour.position, behaviour.gridSystem);
+        }
+    }
+
+    public void ApplyBehaviour(CustomTile tile, Vector3Int position, GridSystem gridSystem)
+    {
+        if (behaviourDictionary.TryGetValue(tile.identifier, out ITileBehaviour behaviour))
+        {
+            Behaviour behaviourStruct = new Behaviour();
+
+            behaviourStruct.behaviour = behaviour;
+            behaviourStruct.tile = tile;
+            behaviourStruct.position = position;
+            behaviourStruct.gridSystem = gridSystem;
+
+            behaviours.Add(behaviourStruct);
+
+            behaviour.Update(tile, position, gridSystem);
+        }
     }
 }
 
-public interface ITileBehavior
+public interface ITileBehaviour
 {
-    void Apply(CustomTile tile, Vector3Int position, GridSystem gridSystem);
+    void Update(CustomTile tile, Vector3Int position, GridSystem gridSystem);
 }
 
-public class MushroomTileBehavior : ITileBehavior
+public class MushroomTileBehaviour : ITileBehaviour
 {
-    public void Apply(CustomTile tile, Vector3Int position, GridSystem gridSystem)
+    public void Update(CustomTile tile, Vector3Int position, GridSystem gridSystem)
     {
         Debug.Log("mushroomin'");
     }
 }
 
-public class ConduitTileBehavior : ITileBehavior
+public class ConduitTileBehaviour : ITileBehaviour
 {
-    public void Apply(CustomTile tile, Vector3Int position, GridSystem gridSystem)
+    public void Update(CustomTile tile, Vector3Int position, GridSystem gridSystem)
     {
         Debug.Log("harnessing essence");
     }
 }
 
-public class SmokesTileBehavior : ITileBehavior
+public class SmokesTileBehaviour : ITileBehaviour
 {
-    public void Apply(CustomTile tile, Vector3Int position, GridSystem gridSystem)
+    public void Update(CustomTile tile, Vector3Int position, GridSystem gridSystem)
     {
         Debug.Log("laying smokes");
     }
 }
 
-public class WallTileBehavior : ITileBehavior
+public class WallTileBehaviour : ITileBehaviour
 {
-    public void Apply(CustomTile tile, Vector3Int position, GridSystem gridSystem)
+    public void Update(CustomTile tile, Vector3Int position, GridSystem gridSystem)
     {
         Debug.Log("blockin' attacks (durability)");
     }
