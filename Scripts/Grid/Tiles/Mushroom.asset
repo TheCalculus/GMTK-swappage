@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 856fc7646eb4c4024ba76ee62f668a04, type: 3}
   m_Name: Mushroom
   m_EditorClassIdentifier: 
-  sprite: {fileID: 21300000, guid: d6a44ab95b0def041a7929981a2c23a1, type: 3}
+  sprite: {fileID: 926101537, guid: f61696bbb067846f39292065cc12cbc3, type: 3}
   layer: 1
+  isFinal: 0
   identifier: 2

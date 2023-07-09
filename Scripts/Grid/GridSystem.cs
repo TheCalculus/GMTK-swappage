@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using UnityEngine.EventSystems;
 
 public class GridSystem : MonoBehaviour
 {
@@ -10,6 +11,9 @@ public class GridSystem : MonoBehaviour
     private CustomTile[,] customTiles;
     private Vector3Int previousHoverPosition;
     private Grid grid;
+
+    [SerializeField]
+    private TileBehaviour tileBehaviour;
 
     private void Start()
     {
@@ -79,17 +83,15 @@ public class GridSystem : MonoBehaviour
             && !tileAtPosition.isFinal
         )
         {
-            CustomTile tile = GetTileByIdentifier(Identifiers.Identifier.MUSHROOM);
+            CustomTile tile = GetTileByIdentifier(tileBehaviour.activeTileType);
+
             if (tile != null)
             {
                 tilemap[1].SetTile(cellPosition, tile);
+                tile.isFinal = Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject();
                 customTiles[cellPosition.x, cellPosition.y] = tile;
-                tile.isFinal = false;
             }
-            
-            if (Input.GetMouseButton(0) && !tileAtPosition.isFinal)
-                tileAtPosition.isFinal = true;
-            
+
             previousHoverPosition = cellPosition;
         }
     }

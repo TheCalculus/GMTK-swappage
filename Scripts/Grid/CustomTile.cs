@@ -8,6 +8,7 @@ public class Identifiers {
         MUSHROOM,
         CONDUIT,
         SMOKES,
+        WALL,
     }
 }
 
