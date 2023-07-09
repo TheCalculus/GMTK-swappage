@@ -18,8 +18,7 @@ public class GridSystem : MonoBehaviour
     [SerializeField]
     private TileBehaviour tileBehaviour;
 
-    // List to store placed tiles for behavior updates
-    private List<Vector3Int> placedTiles = new List<Vector3Int>();
+    private TileBehaviorManager behaviorManager;
 
     private void Start()
     {
@@ -28,13 +27,15 @@ public class GridSystem : MonoBehaviour
 
         customTiles = new CustomTile[gridX, gridY];
 
+        behaviorManager = new TileBehaviorManager();
+
         for (int x = 0; x < gridX; x++)
         {
             for (int y = 0; y < gridY; y++)
             {
                 Identifiers.Identifier identifier = Identifiers.Identifier.GRASS;
-
                 CustomTile tile = GetTileByIdentifier(identifier);
+
                 if (tile != null)
                 {
                     Vector3Int position = new Vector3Int(x, y, 0);
@@ -46,6 +47,11 @@ public class GridSystem : MonoBehaviour
                 {
                     Vector3Int position = new Vector3Int(x, y, 0);
                     tilemap[0].SetColor(position, Color.red);
+                    tile.isCaptured = false;
+                }
+                else
+                {
+                    tile.isCaptured = true;
                 }
             }
         }
@@ -92,7 +98,7 @@ public class GridSystem : MonoBehaviour
 
         if (
             !EventSystem.current.IsPointerOverGameObject()
-            && worldPosition.y <= gridY / 2
+//            && tileAtPosition.isCaptured
             && tilemap[0].HasTile(cellPosition)
             && tilemap[1].GetTile(cellPosition) == null
             && tileAtPosition != null
@@ -103,27 +109,73 @@ public class GridSystem : MonoBehaviour
 
             if (tile != null)
             {
-                tile.ApplyBehavior(cellPosition, this);
-
                 tilemap[1].SetTile(cellPosition, tile);
                 tile.isFinal = Input.GetMouseButton(0);
                 customTiles[cellPosition.x, cellPosition.y] = tile;
 
-                placedTiles.Add(cellPosition);
+                if (tile.isFinal)
+                    behaviorManager.ApplyBehavior(tile, cellPosition, this);
             }
 
             previousHoverPosition = cellPosition;
         }
+    }
+}
 
-        foreach (Vector3Int tilePosition in placedTiles)
-        {
-            CustomTile tile = customTiles[tilePosition.x, tilePosition.y];
-            tile.UpdateBehavior(tilePosition, this);
+public class TileBehaviorManager
+{
+    private Dictionary<Identifiers.Identifier, ITileBehavior> behaviorDictionary;
 
-            // if (shouldRemoveTile)
-            // {
-            //     placedTiles.Remove(tilePosition);
-            // }
-        }
+    public TileBehaviorManager()
+    {
+        behaviorDictionary = new Dictionary<Identifiers.Identifier, ITileBehavior>();
+
+        behaviorDictionary.Add(Identifiers.Identifier.MUSHROOM, new MushroomTileBehavior());
+        behaviorDictionary.Add(Identifiers.Identifier.CONDUIT, new ConduitTileBehavior());
+        behaviorDictionary.Add(Identifiers.Identifier.SMOKES, new SmokesTileBehavior());
+        behaviorDictionary.Add(Identifiers.Identifier.WALL, new WallTileBehavior());
+    }
+
+    public void ApplyBehavior(CustomTile tile, Vector3Int position, GridSystem gridSystem)
+    {
+        if (behaviorDictionary.TryGetValue(tile.identifier, out ITileBehavior behavior))
+            behavior.Apply(tile, position, gridSystem);
+    }
+}
+
+public interface ITileBehavior
+{
+    void Apply(CustomTile tile, Vector3Int position, GridSystem gridSystem);
+}
+
+public class MushroomTileBehavior : ITileBehavior
+{
+    public void Apply(CustomTile tile, Vector3Int position, GridSystem gridSystem)
+    {
+        Debug.Log("mushroomin'");
+    }
+}
+
+public class ConduitTileBehavior : ITileBehavior
+{
+    public void Apply(CustomTile tile, Vector3Int position, GridSystem gridSystem)
+    {
+        Debug.Log("harnessing essence");
+    }
+}
+
+public class SmokesTileBehavior : ITileBehavior
+{
+    public void Apply(CustomTile tile, Vector3Int position, GridSystem gridSystem)
+    {
+        Debug.Log("laying smokes");
+    }
+}
+
+public class WallTileBehavior : ITileBehavior
+{
+    public void Apply(CustomTile tile, Vector3Int position, GridSystem gridSystem)
+    {
+        Debug.Log("blockin' attacks (durability)");
     }
 }
