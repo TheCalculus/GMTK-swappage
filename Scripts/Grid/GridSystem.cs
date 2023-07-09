@@ -4,9 +4,11 @@ using UnityEngine.EventSystems;
 
 public class GridSystem : MonoBehaviour
 {
-    public Tilemap[] tilemap = new Tilemap[2]; // Changed the array size to 2 (0 and 1)
+    public Tilemap[] tilemap = new Tilemap[2];
     public CustomTile[] tileset;
-    public int sideLength;
+
+    public int gridX = 50;
+    public int gridY = 200;
 
     private CustomTile[,] customTiles;
     private Vector3Int previousHoverPosition;
@@ -18,11 +20,13 @@ public class GridSystem : MonoBehaviour
     private void Start()
     {
         grid = GetComponent<Grid>();
-        customTiles = new CustomTile[sideLength, sideLength];
+        Camera.main.transform.position = new Vector3(gridX / 2, 0.175f * gridY, -10);
 
-        for (int x = 0; x < sideLength; x++)
+        customTiles = new CustomTile[gridX, gridY];
+
+        for (int x = 0; x < gridX; x++)
         {
-            for (int y = 0; y < sideLength; y++)
+            for (int y = 0; y < gridY; y++)
             {
                 Identifiers.Identifier identifier = Identifiers.Identifier.GRASS;
 
@@ -30,8 +34,14 @@ public class GridSystem : MonoBehaviour
                 if (tile != null)
                 {
                     Vector3Int position = new Vector3Int(x, y, 0);
-                    tilemap[0].SetTile(position, tile); // Changed the tilemap index to 0
+                    tilemap[0].SetTile(position, tile);
                     customTiles[x, y] = tile;
+                }
+
+                if (y >= gridY / 2)
+                {
+                    Vector3Int position = new Vector3Int(x, y, 0);
+                    tilemap[0].SetColor(position, Color.red);
                 }
             }
         }
@@ -77,7 +87,9 @@ public class GridSystem : MonoBehaviour
         CustomTile tileAtPosition = GetTile(cellPosition);
 
         if (
-            tilemap[0].HasTile(cellPosition)
+            !EventSystem.current.IsPointerOverGameObject()
+            && worldPosition.y <= gridY / 2
+            && tilemap[0].HasTile(cellPosition)
             && tilemap[1].GetTile(cellPosition) == null
             && tileAtPosition != null
             && !tileAtPosition.isFinal
@@ -88,8 +100,7 @@ public class GridSystem : MonoBehaviour
             if (tile != null)
             {
                 tilemap[1].SetTile(cellPosition, tile);
-                tile.isFinal =
-                    Input.GetMouseButton(0) && !EventSystem.current.IsPointerOverGameObject();
+                tile.isFinal = Input.GetMouseButton(0);
                 customTiles[cellPosition.x, cellPosition.y] = tile;
             }
 
