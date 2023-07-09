@@ -47,33 +47,50 @@ public class GridSystem : MonoBehaviour
         return null;
     }
 
+    private CustomTile GetTile(Vector3Int position)
+    {
+        int x = position.x;
+        int y = position.y;
+
+        int dimX = customTiles.GetLength(0);
+        int dimY = customTiles.GetLength(1);
+
+        if (x >= 0 && y >= 0 && x < dimX && y < dimY)
+            return customTiles[x, y];
+
+        return null;
+    }
+
     private void Update()
     {
-        if (tilemap[1].HasTile(previousHoverPosition))
+        if (tilemap[1].HasTile(previousHoverPosition) && !GetTile(previousHoverPosition).isFinal)
             tilemap[1].SetTile(previousHoverPosition, null);
 
         Vector3 mousePosition = Input.mousePosition;
         Vector3 worldPosition = Camera.main.ScreenToWorldPoint(mousePosition);
 
         Vector3Int cellPosition = grid.WorldToCell(worldPosition);
+        CustomTile tileAtPosition = GetTile(cellPosition);
 
-        if (tilemap[0].HasTile(cellPosition) && tilemap[1].GetTile(cellPosition) == null)
+        if (
+            tilemap[0].HasTile(cellPosition)
+            && tilemap[1].GetTile(cellPosition) == null
+            && tileAtPosition != null
+            && !tileAtPosition.isFinal
+        )
         {
             CustomTile tile = GetTileByIdentifier(Identifiers.Identifier.MUSHROOM);
             if (tile != null)
             {
                 tilemap[1].SetTile(cellPosition, tile);
                 customTiles[cellPosition.x, cellPosition.y] = tile;
-                previousHoverPosition = cellPosition;
+                tile.isFinal = false;
             }
-        }
-
-        if (Input.GetMouseButtonDown(0))
-        {
-            CustomTile tile = customTiles[previousHoverPosition.x, previousHoverPosition.y];
-            if (tile != null)
-                tile.isFinal = true;
-            previousHoverPosition = new Vector3Int(-1, -1, -1);
+            
+            if (Input.GetMouseButton(0) && !tileAtPosition.isFinal)
+                tileAtPosition.isFinal = true;
+            
+            previousHoverPosition = cellPosition;
         }
     }
 }
