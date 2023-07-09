@@ -1,8 +1,10 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class Identifiers {
-    public enum Identifier {
+public class Identifiers
+{
+    public enum Identifier
+    {
         GRASS,
         DIRT,
         MUSHROOM,
@@ -25,4 +27,31 @@ public class CustomTile : TileBase
         tileData.sprite = sprite;
         tileData.colliderType = Tile.ColliderType.None;
     }
+
+    public void UpdateBehavior(Vector3Int position, GridSystem gridSystem)
+    {
+        switch (identifier)
+        {
+            case Identifiers.Identifier.MUSHROOM:
+                UpdateMushroomBehavior(position, gridSystem);
+                break;
+            case Identifiers.Identifier.CONDUIT:
+                UpdateConduitBehavior(position, gridSystem);
+                break;
+            case Identifiers.Identifier.SMOKES:
+                UpdateSmokesBehavior(position, gridSystem);
+                break;
+            case Identifiers.Identifier.WALL:
+                UpdateWallBehavior(position, gridSystem);
+                break;
+        }
+    }
+
+    private void UpdateMushroomBehavior(Vector3Int position, GridSystem gridSystem) { }
+
+    private void UpdateConduitBehavior(Vector3Int position, GridSystem gridSystem) { }
+
+    private void UpdateSmokesBehavior(Vector3Int position, GridSystem gridSystem) { }
+
+    private void UpdateWallBehavior(Vector3Int position, GridSystem gridSystem) { }
 }

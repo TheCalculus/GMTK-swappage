@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.EventSystems;
+using System.Collections.Generic;
 
 public class GridSystem : MonoBehaviour
 {
@@ -16,6 +17,9 @@ public class GridSystem : MonoBehaviour
 
     [SerializeField]
     private TileBehaviour tileBehaviour;
+
+    // List to store placed tiles for behavior updates
+    private List<Vector3Int> placedTiles = new List<Vector3Int>();
 
     private void Start()
     {
@@ -99,12 +103,27 @@ public class GridSystem : MonoBehaviour
 
             if (tile != null)
             {
+                tile.ApplyBehavior(cellPosition, this);
+
                 tilemap[1].SetTile(cellPosition, tile);
                 tile.isFinal = Input.GetMouseButton(0);
                 customTiles[cellPosition.x, cellPosition.y] = tile;
+
+                placedTiles.Add(cellPosition);
             }
 
             previousHoverPosition = cellPosition;
+        }
+
+        foreach (Vector3Int tilePosition in placedTiles)
+        {
+            CustomTile tile = customTiles[tilePosition.x, tilePosition.y];
+            tile.UpdateBehavior(tilePosition, this);
+
+            // if (shouldRemoveTile)
+            // {
+            //     placedTiles.Remove(tilePosition);
+            // }
         }
     }
 }
