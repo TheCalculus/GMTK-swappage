@@ -13,4 +13,7 @@ MonoBehaviour:
   m_Name: Grass
   m_EditorClassIdentifier: 
   sprite: {fileID: 21300030, guid: 1c9ed9d1200c29d4cbfd2071028c1cd5, type: 3}
+  layer: 0
+  isFinal: 0
+  isCaptured: 1
   identifier: 0

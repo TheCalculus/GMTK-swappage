@@ -40,18 +40,17 @@ public class GridSystem : MonoBehaviour
                 {
                     Vector3Int position = new Vector3Int(x, y, 0);
                     tilemap[0].SetTile(position, tile);
-                    customTiles[x, y] = tile;
-                }
 
-                if (y >= gridY / 2)
-                {
-                    Vector3Int position = new Vector3Int(x, y, 0);
-                    tilemap[0].SetColor(position, Color.red);
-                    tile.isCaptured = false;
-                }
-                else
-                {
-                    tile.isCaptured = true;
+                    if (y >= gridY / 2)
+                    {
+                        tilemap[0].SetColor(position, Color.red);
+                    }
+                    else
+                    {
+                        tile.isCaptured = true;
+                    }
+
+                    customTiles[x, y] = tile;
                 }
             }
         }
@@ -64,6 +63,7 @@ public class GridSystem : MonoBehaviour
             if (tile.identifier == identifier)
             {
                 tile.isFinal = false;
+                tile.isCaptured = false;
                 return tile;
             }
         }
@@ -98,7 +98,7 @@ public class GridSystem : MonoBehaviour
 
         if (
             !EventSystem.current.IsPointerOverGameObject()
-//            && tileAtPosition.isCaptured
+            && worldPosition.y <= gridY / 2
             && tilemap[0].HasTile(cellPosition)
             && tilemap[1].GetTile(cellPosition) == null
             && tileAtPosition != null

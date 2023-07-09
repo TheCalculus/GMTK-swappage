@@ -15,4 +15,5 @@ MonoBehaviour:
   sprite: {fileID: 1448497479, guid: 33857cac0685c4d0db84e34051e3edc3, type: 3}
   layer: 1
   isFinal: 0
+  isCaptured: 1
   identifier: 4
