@@ -11,13 +11,12 @@ public class GridSystem : MonoBehaviour
     public int gridX = 50;
     public int gridY = 200;
 
-    private CustomTile[,] customTiles;
+    public CustomTile[,] customTiles;
     private Vector3Int previousHoverPosition;
     private Grid grid;
 
     [SerializeField]
     private TileBehaviour tileBehaviour;
-
     private TileBehaviourManager behaviourManager;
 
     private void Start()
@@ -39,23 +38,23 @@ public class GridSystem : MonoBehaviour
                 {
                     Vector3Int position = new Vector3Int(x, y, 0);
                     tilemap[0].SetTile(position, tile);
+                    customTiles[x, y] = tile;
 
                     if (y >= gridY / 2)
                     {
+                        tile.isCaptured = true;
                         tilemap[0].SetColor(position, Color.red);
                     }
                     else
                     {
-                        tile.isCaptured = true;
+                        tile.isCaptured = false;
                     }
-
-                    customTiles[x, y] = tile;
                 }
             }
         }
     }
 
-    private CustomTile GetTileByIdentifier(Identifiers.Identifier identifier)
+    public CustomTile GetTileByIdentifier(Identifiers.Identifier identifier)
     {
         foreach (CustomTile tile in tileset)
         {
@@ -97,10 +96,9 @@ public class GridSystem : MonoBehaviour
 
         if (
             !EventSystem.current.IsPointerOverGameObject()
-            && worldPosition.y <= gridY / 2
-            && tilemap[0].HasTile(cellPosition)
-            && tilemap[1].GetTile(cellPosition) == null
             && tileAtPosition != null
+            && tileAtPosition.isCaptured
+            && tilemap[1].GetTile(cellPosition) == null
             && !tileAtPosition.isFinal
         )
         {
@@ -150,9 +148,13 @@ public class TileBehaviourManager
 
     public void UpdateAllBehaviours()
     {
-        foreach (Behaviour behaviour in behaviours)
+        for (int i = behaviours.Count - 1; i >= 0; i--)
         {
+            Behaviour behaviour = behaviours[i];
             behaviour.behaviour.Update(behaviour.tile, behaviour.position, behaviour.gridSystem);
+
+            if (behaviour.tile.isFinal)
+                behaviours.RemoveAt(i);
         }
     }
 
@@ -169,7 +171,7 @@ public class TileBehaviourManager
 
             behaviours.Add(behaviourStruct);
 
-            behaviour.Update(tile, position, gridSystem);
+            Debug.Log("added behaviour to list");
         }
     }
 }
@@ -181,32 +183,39 @@ public interface ITileBehaviour
 
 public class MushroomTileBehaviour : ITileBehaviour
 {
+    int iterations = 0;
+    Vector3Int pos;
+
     public void Update(CustomTile tile, Vector3Int position, GridSystem gridSystem)
     {
-        Debug.Log("mushroomin'");
+        // slowly advance captures vertically with some horizontal offsetting
+        if (iterations == 0)
+        {
+            pos = position;
+            Debug.Log("mushroom iteration 1");
+        }
+
+        if (pos.y < gridSystem.gridY)
+        {
+            gridSystem.customTiles[pos.x, pos.y].isCaptured = true;
+            gridSystem.tilemap[0].SetColor(pos, Color.white);
+            pos.y += 1;
+            iterations++;
+        }
     }
 }
 
 public class ConduitTileBehaviour : ITileBehaviour
 {
-    public void Update(CustomTile tile, Vector3Int position, GridSystem gridSystem)
-    {
-        Debug.Log("harnessing essence");
-    }
+    public void Update(CustomTile tile, Vector3Int position, GridSystem gridSystem) { }
 }
 
 public class SmokesTileBehaviour : ITileBehaviour
 {
-    public void Update(CustomTile tile, Vector3Int position, GridSystem gridSystem)
-    {
-        Debug.Log("laying smokes");
-    }
+    public void Update(CustomTile tile, Vector3Int position, GridSystem gridSystem) { }
 }
 
 public class WallTileBehaviour : ITileBehaviour
 {
-    public void Update(CustomTile tile, Vector3Int position, GridSystem gridSystem)
-    {
-        Debug.Log("blockin' attacks (durability)");
-    }
+    public void Update(CustomTile tile, Vector3Int position, GridSystem gridSystem) { }
 }
