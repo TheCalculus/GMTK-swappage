@@ -23,10 +23,12 @@ public class SpriteTile
     internal BehaviourDelegate behaviour = null;
 
     private int iterations = 0;
+    private Vector3Int newPosition;
 
-    public SpriteTile(Vector3Int position, CustomTileBase tile, SpriteType type, Tilemap tilemap)
+    public SpriteTile(Vector3Int position, CustomTileBase tile, SpriteType type)
     {
         this.position = position;
+        this.newPosition = position;
         this.tile = tile;
         this.type = type;
 
@@ -35,10 +37,11 @@ public class SpriteTile
             case SpriteType.MUSHROOM:
                 behaviour = () =>
                 {
-                    while (this.iterations++ <= 10)
-                        ;
-                    Debug.Log(this.iterations);
-                    behaviour = null;
+                    this.newPosition.y += 1;
+                    this.iterations++;
+                    GridRework.PlaceTile(newPosition, tile, this.type, true);
+                    if (this.iterations == 10)
+                        this.behaviour = null;
                 };
                 break;
             case SpriteType.CONDUIT:
@@ -65,7 +68,7 @@ public class GridRework : MonoBehaviour
 
     public Sprite[] spriteSheet;
 
-    public Sprite getSprite(SpriteType type)
+    public Sprite GetSprite(SpriteType type)
     {
         return spriteSheet[(int)type];
     }
@@ -82,7 +85,7 @@ public class GridRework : MonoBehaviour
                 int index = (x * gridY) + y;
                 positions[index] = new Vector3Int(x, y, 0);
                 CustomTileBase tile = ScriptableObject.CreateInstance<CustomTileBase>();
-                tile.SetCustomTileBase(getSprite(SpriteType.GRASS));
+                tile.SetCustomTileBase(GetSprite(SpriteType.GRASS));
                 sprites[index] = tile;
             }
         }
@@ -107,16 +110,31 @@ public class GridRework : MonoBehaviour
             int index = (gridX * position.x) + position.y;
 
             CustomTileBase tile = ScriptableObject.CreateInstance<CustomTileBase>();
-            tile.SetCustomTileBase(getSprite(SpriteType.MUSHROOM));
+            tile.SetCustomTileBase(GetSprite(SpriteType.MUSHROOM));
 
-            state.Add(new SpriteTile(position, tile, SpriteType.MUSHROOM, tilemaps[1]));
-            tilemaps[1].SetTile(position, tile);
+            PlaceTile(position, tile, SpriteType.MUSHROOM, false);
         }
 
         foreach (SpriteTile spriteTile in state)
         {
             if (spriteTile.behaviour != null)
                 spriteTile.behaviour();
+        }
+    }
+
+    public static void PlaceTile(
+        Vector3Int position,
+        CustomTileBase tile,
+        SpriteType type,
+        bool isGhost
+    )
+    {
+        GridRework instance = FindObjectOfType<GridRework>();
+        if (instance != null)
+        {
+            instance.tilemaps[1].SetTile(position, tile);
+            if (!isGhost)
+                instance.state.Add(new SpriteTile(position, tile, type));
         }
     }
 }
