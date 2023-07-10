@@ -3,15 +3,51 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public struct SpriteTile
+public enum SpriteType
+{
+    GRASS,
+    DIRT,
+    MUSHROOM,
+    CONDUIT,
+    SMOKES,
+    WALL,
+}
+
+public class SpriteTile
 {
     public Vector3Int position;
     public CustomTileBase tile;
+    public SpriteType type;
 
-    public SpriteTile(Vector3Int position, CustomTileBase tile)
+    internal delegate void BehaviourDelegate();
+    internal BehaviourDelegate behaviour = null;
+
+    private int iterations = 0;
+
+    public SpriteTile(Vector3Int position, CustomTileBase tile, SpriteType type, Tilemap tilemap)
     {
         this.position = position;
         this.tile = tile;
+        this.type = type;
+
+        switch (this.type)
+        {
+            case SpriteType.MUSHROOM:
+                behaviour = () =>
+                {
+                    while (this.iterations++ <= 10)
+                        ;
+                    Debug.Log(this.iterations);
+                    behaviour = null;
+                };
+                break;
+            case SpriteType.CONDUIT:
+                break;
+            case SpriteType.SMOKES:
+                break;
+            case SpriteType.WALL:
+                break;
+        }
     }
 }
 
@@ -29,14 +65,9 @@ public class GridRework : MonoBehaviour
 
     public Sprite[] spriteSheet;
 
-    public enum spriteType
+    public Sprite getSprite(SpriteType type)
     {
-        GRASS,
-        DIRT,
-        MUSHROOM,
-        CONDUIT,
-        SMOKES,
-        WALL,
+        return spriteSheet[(int)type];
     }
 
     private void Start()
@@ -51,7 +82,7 @@ public class GridRework : MonoBehaviour
                 int index = (x * gridY) + y;
                 positions[index] = new Vector3Int(x, y, 0);
                 CustomTileBase tile = ScriptableObject.CreateInstance<CustomTileBase>();
-                tile.SetCustomTileBase(spriteSheet[(int)spriteType.GRASS]);
+                tile.SetCustomTileBase(getSprite(SpriteType.GRASS));
                 sprites[index] = tile;
             }
         }
@@ -76,10 +107,16 @@ public class GridRework : MonoBehaviour
             int index = (gridX * position.x) + position.y;
 
             CustomTileBase tile = ScriptableObject.CreateInstance<CustomTileBase>();
-            tile.SetCustomTileBase(spriteSheet[(int)spriteType.CONDUIT]);
+            tile.SetCustomTileBase(getSprite(SpriteType.MUSHROOM));
 
-            state.Add(new SpriteTile(position, tile));
+            state.Add(new SpriteTile(position, tile, SpriteType.MUSHROOM, tilemaps[1]));
             tilemaps[1].SetTile(position, tile);
+        }
+
+        foreach (SpriteTile spriteTile in state)
+        {
+            if (spriteTile.behaviour != null)
+                spriteTile.behaviour();
         }
     }
 }

@@ -841,8 +841,8 @@ MonoBehaviour:
   spriteSheet:
   - {fileID: 21300054, guid: 1c9ed9d1200c29d4cbfd2071028c1cd5, type: 3}
   - {fileID: 21300098, guid: 1c9ed9d1200c29d4cbfd2071028c1cd5, type: 3}
-  - {fileID: 21300000, guid: 3be20c1e26e394e21beba56c575f703a, type: 3}
   - {fileID: 926101537, guid: f61696bbb067846f39292065cc12cbc3, type: 3}
+  - {fileID: 21300000, guid: 3be20c1e26e394e21beba56c575f703a, type: 3}
   - {fileID: 1448497479, guid: 33857cac0685c4d0db84e34051e3edc3, type: 3}
   - {fileID: 21300000, guid: dd53708bbdab1403c8981634caeb2d95, type: 3}
 --- !u!1 &1381169613
