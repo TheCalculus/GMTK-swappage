@@ -244,9 +244,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2001114359}
+      - m_Target: {fileID: 1175955321}
         m_TargetAssemblyTypeName: TileBehaviour, Assembly-CSharp
-        m_MethodName: SelectTile
+        m_MethodName: 
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -377,10 +377,10 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2001114359}
-        m_TargetAssemblyTypeName: TileBehaviour, Assembly-CSharp
-        m_MethodName: SelectTile
-        m_Mode: 3
+      - m_Target: {fileID: 1175955321}
+        m_TargetAssemblyTypeName: UnityEngine.Behaviour, UnityEngine
+        m_MethodName: 
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -735,9 +735,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2001114359}
+      - m_Target: {fileID: 1175955321}
         m_TargetAssemblyTypeName: TileBehaviour, Assembly-CSharp
-        m_MethodName: SelectTile
+        m_MethodName: 
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -757,7 +757,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1175955324}
   - component: {fileID: 1175955323}
-  - component: {fileID: 1175955322}
   - component: {fileID: 1175955325}
   m_Layer: 0
   m_Name: Grid
@@ -766,31 +765,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1175955322
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1175955321}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e0536c09c67c54026a1120aef4e7095a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  tilemap:
-  - {fileID: 1945919211}
-  - {fileID: 780180847}
-  tileset:
-  - {fileID: 11400000, guid: b224ed07780174c49ab5f43b951a8bda, type: 2}
-  - {fileID: 11400000, guid: 371ee7417d0a04f6280df9f328fcbd5b, type: 2}
-  - {fileID: 11400000, guid: cee2762e19a384eb69b0436b5f9c3678, type: 2}
-  - {fileID: 11400000, guid: a0a1221ddede04eb189b605aca350395, type: 2}
-  - {fileID: 11400000, guid: ff35bf0b0398f480980d9a8a033fc0da, type: 2}
-  - {fileID: 11400000, guid: 2ca4ccfb3f942421d8176b45b5159a89, type: 2}
-  gridX: 25
-  gridY: 20
-  tileBehaviour: {fileID: 2001114359}
 --- !u!156049354 &1175955323
 Grid:
   m_ObjectHideFlags: 0
@@ -838,6 +812,7 @@ MonoBehaviour:
   - {fileID: 0}
   gridX: 40
   gridY: 20
+  activeType: 0
   spriteSheet:
   - {fileID: 21300054, guid: 1c9ed9d1200c29d4cbfd2071028c1cd5, type: 3}
   - {fileID: 21300098, guid: 1c9ed9d1200c29d4cbfd2071028c1cd5, type: 3}
@@ -845,6 +820,10 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 3be20c1e26e394e21beba56c575f703a, type: 3}
   - {fileID: 1448497479, guid: 33857cac0685c4d0db84e34051e3edc3, type: 3}
   - {fileID: 21300000, guid: dd53708bbdab1403c8981634caeb2d95, type: 3}
+  mushroomButton: {fileID: 361045561}
+  conduitButton: {fileID: 60994575}
+  smokesButton: {fileID: 922067707}
+  wallButton: {fileID: 2061375159}
 --- !u!1 &1381169613
 GameObject:
   m_ObjectHideFlags: 0
@@ -1066,51 +1045,6 @@ Transform:
   m_Father: {fileID: 1175955324}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &2001114358
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2001114360}
-  - component: {fileID: 2001114359}
-  m_Layer: 0
-  m_Name: TileBehaviour
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &2001114359
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2001114358}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c585de18c3d764e21976098eb7f54aa2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  activeTileType: 0
---- !u!4 &2001114360
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2001114358}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 4
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2010865535
 GameObject:
   m_ObjectHideFlags: 0
@@ -1300,9 +1234,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2001114359}
+      - m_Target: {fileID: 1175955321}
         m_TargetAssemblyTypeName: TileBehaviour, Assembly-CSharp
-        m_MethodName: SelectTile
+        m_MethodName: 
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

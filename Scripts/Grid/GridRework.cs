@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.Tilemaps;
 
 public enum SpriteType
@@ -66,7 +67,18 @@ public class GridRework : MonoBehaviour
     public int gridX = 40;
     public int gridY = 20;
 
+    public SpriteType activeType;
     public Sprite[] spriteSheet;
+
+    public Button mushroomButton;
+    public Button conduitButton;
+    public Button smokesButton;
+    public Button wallButton;
+
+    public void SetActiveTile(SpriteType type)
+    {
+        activeType = type;
+    }
 
     public Sprite GetSprite(SpriteType type)
     {
@@ -75,6 +87,11 @@ public class GridRework : MonoBehaviour
 
     private void Start()
     {
+        mushroomButton.onClick.AddListener(() => activeType = SpriteType.MUSHROOM);
+        conduitButton.onClick.AddListener(() => activeType = SpriteType.CONDUIT);
+        smokesButton.onClick.AddListener(() => activeType = SpriteType.SMOKES);
+        wallButton.onClick.AddListener(() => activeType = SpriteType.WALL);
+        
         positions = new Vector3Int[gridX * gridY];
         sprites = new CustomTileBase[gridX * gridY];
 
@@ -110,9 +127,9 @@ public class GridRework : MonoBehaviour
             int index = (gridX * position.x) + position.y;
 
             CustomTileBase tile = ScriptableObject.CreateInstance<CustomTileBase>();
-            tile.SetCustomTileBase(GetSprite(SpriteType.MUSHROOM));
+            tile.SetCustomTileBase(GetSprite(activeType));
 
-            PlaceTile(position, tile, SpriteType.MUSHROOM, false);
+            PlaceTile(position, tile, activeType, false);
         }
 
         foreach (SpriteTile spriteTile in state)
