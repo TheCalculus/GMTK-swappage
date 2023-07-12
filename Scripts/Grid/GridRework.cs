@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -19,36 +18,33 @@ public class SpriteTile
     public Vector3Int position;
     public CustomTileBase tile;
     public SpriteType type;
+    private int iterations = 0;
+    public bool isCaptured { get; private set; }
 
     internal delegate void BehaviourDelegate();
     internal BehaviourDelegate behaviour = null;
 
-    private int iterations = 0;
-    private Vector3Int newPosition;
-
     public SpriteTile(Vector3Int position, CustomTileBase tile, SpriteType type)
     {
         this.position = position;
-        this.newPosition = position;
         this.tile = tile;
         this.type = type;
+        this.isCaptured = false;
 
         switch (this.type)
         {
             case SpriteType.MUSHROOM:
                 behaviour = () =>
                 {
-                    this.newPosition.y += 1;
+                    this.position.y += 1;
                     this.iterations++;
-                    GridRework.PlaceTile(newPosition, tile, this.type, true);
+                    GridRework.PlaceTile(this.position, this.tile, this.type, true);
                     if (this.iterations == 10)
                         this.behaviour = null;
                 };
                 break;
             case SpriteType.CONDUIT:
-                break;
             case SpriteType.SMOKES:
-                break;
             case SpriteType.WALL:
                 break;
         }
@@ -58,22 +54,20 @@ public class SpriteTile
 public class GridRework : MonoBehaviour
 {
     public Tilemap[] tilemaps = new Tilemap[3]; /* layer 0 and 1 for level, 2 for units */
-
-    private CustomTileBase[] sprites;
-    private Vector3Int[] positions;
-
-    private List<SpriteTile> state = new List<SpriteTile>();
-
     public int gridX = 40;
     public int gridY = 20;
-
     public SpriteType activeType;
     public Sprite[] spriteSheet;
-
     public Button mushroomButton;
     public Button conduitButton;
     public Button smokesButton;
     public Button wallButton;
+
+    private CustomTileBase[] sprites;
+    private Vector3Int[] positions;
+    private List<SpriteTile> state = new List<SpriteTile>();
+
+    private static GridRework instance;
 
     public void SetActiveTile(SpriteType type)
     {
@@ -87,11 +81,13 @@ public class GridRework : MonoBehaviour
 
     private void Start()
     {
+        instance = this;
+
         mushroomButton.onClick.AddListener(() => activeType = SpriteType.MUSHROOM);
         conduitButton.onClick.AddListener(() => activeType = SpriteType.CONDUIT);
         smokesButton.onClick.AddListener(() => activeType = SpriteType.SMOKES);
         wallButton.onClick.AddListener(() => activeType = SpriteType.WALL);
-        
+
         positions = new Vector3Int[gridX * gridY];
         sprites = new CustomTileBase[gridX * gridY];
 
@@ -100,10 +96,9 @@ public class GridRework : MonoBehaviour
             for (int y = 0; y < gridY; y++)
             {
                 int index = (x * gridY) + y;
+
                 positions[index] = new Vector3Int(x, y, 0);
-                CustomTileBase tile = ScriptableObject.CreateInstance<CustomTileBase>();
-                tile.SetCustomTileBase(GetSprite(SpriteType.GRASS));
-                sprites[index] = tile;
+                sprites[index] = CreateCustomTile(GetSprite(SpriteType.GRASS));
             }
         }
 
@@ -126,16 +121,17 @@ public class GridRework : MonoBehaviour
         {
             int index = (gridX * position.x) + position.y;
 
-            CustomTileBase tile = ScriptableObject.CreateInstance<CustomTileBase>();
-            tile.SetCustomTileBase(GetSprite(activeType));
-
+            CustomTileBase tile = CreateCustomTile(GetSprite(activeType));
             PlaceTile(position, tile, activeType, false);
         }
 
-        foreach (SpriteTile spriteTile in state)
+        for (int i = state.Count - 1; i >= 0; i--)
         {
+            SpriteTile spriteTile = state[i];
             if (spriteTile.behaviour != null)
                 spriteTile.behaviour();
+            else
+                state.RemoveAt(i);
         }
     }
 
@@ -146,13 +142,19 @@ public class GridRework : MonoBehaviour
         bool isGhost
     )
     {
-        GridRework instance = FindObjectOfType<GridRework>();
-        if (instance != null)
+        if (instance != null && !instance.state.Exists(st => st.position == position && st.isCaptured))
         {
             instance.tilemaps[1].SetTile(position, tile);
             if (!isGhost)
                 instance.state.Add(new SpriteTile(position, tile, type));
         }
+    }
+
+    private CustomTileBase CreateCustomTile(Sprite sprite)
+    {
+        CustomTileBase tile = ScriptableObject.CreateInstance<CustomTileBase>();
+        tile.SetCustomTileBase(sprite);
+        return tile;
     }
 }
 
