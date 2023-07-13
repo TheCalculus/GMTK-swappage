@@ -53,18 +53,21 @@ public class SpriteTile
 
 public class GridRework : MonoBehaviour
 {
+    [Header("Grid, Sprites")]
     public Tilemap[] tilemaps = new Tilemap[3]; /* layer 0 and 1 for level, 2 for units */
+    public Sprite[] spriteSheet;
+    public SpriteType activeType;
+
+    [Header("Grid Dimensions")]
     public int gridX = 40;
     public int gridY = 20;
-    public SpriteType activeType;
-    public Sprite[] spriteSheet;
+
+    [Header("UI")]
     public Button mushroomButton;
     public Button conduitButton;
     public Button smokesButton;
     public Button wallButton;
 
-    private CustomTileBase[] sprites;
-    private Vector3Int[] positions;
     private List<SpriteTile> state = new List<SpriteTile>();
 
     private static GridRework instance;
@@ -88,21 +91,23 @@ public class GridRework : MonoBehaviour
         smokesButton.onClick.AddListener(() => activeType = SpriteType.SMOKES);
         wallButton.onClick.AddListener(() => activeType = SpriteType.WALL);
 
-        positions = new Vector3Int[gridX * gridY];
-        sprites = new CustomTileBase[gridX * gridY];
-
+        CustomTileBase tile = CreateCustomTile(GetSprite(SpriteType.GRASS)); // all tiles in start are grass
+        Vector3Int position = new Vector3Int(0, 0, 0); // position can be reused
         for (int x = 0; x < gridX; x++)
         {
             for (int y = 0; y < gridY; y++)
             {
-                int index = (x * gridY) + y;
+                position.x = x;
+                position.y = y;
 
-                positions[index] = new Vector3Int(x, y, 0);
-                sprites[index] = CreateCustomTile(GetSprite(SpriteType.GRASS));
+                tilemaps[0].SetTile(position, tile);
+
+                if (y >= gridY / 2)
+                    tilemaps[0].SetColor(position, Color.red);
+
+                state.Add(new SpriteTile(position, tile, SpriteType.GRASS));
             }
         }
-
-        tilemaps[0].SetTiles(positions, sprites);
     }
 
     private void Update()
@@ -142,11 +147,16 @@ public class GridRework : MonoBehaviour
         bool isGhost
     )
     {
-        if (instance != null && !instance.state.Exists(st => st.position == position && st.isCaptured))
+        if (
+            instance != null
+            && !instance.state.Exists(st => st.position == position && st.isCaptured)
+        )
         {
             instance.tilemaps[1].SetTile(position, tile);
             if (!isGhost)
-                instance.state.Add(new SpriteTile(position, tile, type));
+                instance.state[(position.x * instance.gridX + position.y)] = (
+                    new SpriteTile(position, tile, type)
+                );
         }
     }
 
